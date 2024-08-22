@@ -1,0 +1,74 @@
+import hashlib
+import sys
+import msvcrt
+
+class ElectronicVotingSystem:
+    def __init__(self):
+        self.candidates = ["Alice", "Bob", "Charlie"]
+        self.votes = []
+
+    def cast_vote(self, voter_id, candidate_index):
+        if candidate_index < 0 or candidate_index >= len(self.candidates):
+            print("Invalid candidate selected.")
+            return False
+        
+        # Create a hash to ensure vote integrity and anonymity
+        vote_hash = hashlib.sha256(f"{voter_id}-{candidate_index}".encode()).hexdigest()
+        
+        # Store the vote anonymously
+        self.votes.append(vote_hash)
+        print(f"Vote cast successfully by voter {voter_id} for {self.candidates[candidate_index]}")
+        return True
+
+    def tally_votes(self):
+        results = {candidate: 0 for candidate in self.candidates}
+        
+        for vote_hash in self.votes:
+            candidate_index = int(vote_hash[-1]) % len(self.candidates)
+            results[self.candidates[candidate_index]] += 1
+
+        print("\nElection Results:")
+        for candidate, count in results.items():
+            print(f"{candidate}: {count} votes")
+
+def masked_input(prompt=""):
+    print(prompt, end="", flush=True)
+    voter_id = ""
+    while True:
+        char = msvcrt.getch()
+        if char == b'\r':  # Enter key pressed
+            print()  # Move to the next line
+            break
+        elif char == b'\x08':  # Backspace pressed
+            if len(voter_id) > 0:
+                voter_id = voter_id[:-1]
+                sys.stdout.write('\b \b')
+                sys.stdout.flush()
+        else:
+            sys.stdout.write('*')
+            sys.stdout.flush()
+            voter_id += char.decode("utf-8")
+    return voter_id
+
+if __name__ == "__main__":
+    evs = ElectronicVotingSystem()
+    
+    while True:
+        print("\nCandidates:")
+        for i, candidate in enumerate(evs.candidates):
+            print(f"{i}. {candidate}")
+        
+        voter_id = masked_input("Enter your voter ID: ")  # Custom masked input
+        
+        # Clear the input buffer
+        msvcrt.getch()
+        
+        candidate_index = int(input("Select the candidate index to vote for: "))
+        
+        evs.cast_vote(voter_id, candidate_index)
+        
+        another_vote = input("Is there another voter? (yes/no): ").lower()
+        if another_vote != "yes":
+            break
+    
+    evs.tally_votes()
