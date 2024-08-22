@@ -12,10 +12,10 @@ class ElectronicVotingSystem:
             print("Invalid candidate selected.")
             return False
         
-        # Create a hash to ensure vote integrity and anonymity
+       
         vote_hash = hashlib.sha256(f"{voter_id}-{candidate_index}".encode()).hexdigest()
         
-        # Store the vote anonymously
+       
         self.votes.append(vote_hash)
         print(f"Vote cast successfully by voter {voter_id} for {self.candidates[candidate_index]}")
         return True
@@ -36,10 +36,10 @@ def masked_input(prompt=""):
     voter_id = ""
     while True:
         char = msvcrt.getch()
-        if char == b'\r':  # Enter key pressed
+        if char == b'\r': 
             print()  # Move to the next line
             break
-        elif char == b'\x08':  # Backspace pressed
+        elif char == b'\x08': 
             if len(voter_id) > 0:
                 voter_id = voter_id[:-1]
                 sys.stdout.write('\b \b')
@@ -58,9 +58,8 @@ if __name__ == "__main__":
         for i, candidate in enumerate(evs.candidates):
             print(f"{i}. {candidate}")
         
-        voter_id = masked_input("Enter your voter ID: ")  # Custom masked input
+        voter_id = masked_input("Enter your voter ID: ")  
         
-        # Clear the input buffer
         msvcrt.getch()
         
         candidate_index = int(input("Select the candidate index to vote for: "))
